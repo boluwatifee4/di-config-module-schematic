@@ -1,0 +1,10 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "di-config-module-schematic": {
+      "description": "Generate a DI-configured module",
+      "factory": "./di-config-module-schematic/index",
+      "schema": "./di-config-module-schematic/schema.json"
+    }
+  }
+}
