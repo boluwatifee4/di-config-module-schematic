@@ -6,9 +6,9 @@
 
 - Clone the project
 - In your angular project directory run `schematics <path-to-schematics-project>:di-config-module-schematic` (This schematic is built to use prompts. Hence eliminating the need to pass/look for the schematic's options
-- Answer the questions asked in the terminal, you should have your module created and set-up to support DI(dependency injection).
+- Answer the questions asked in the terminal, once the processes are completed, you should have your module created and set-up to support [DI(dependency injection)](https://angular.dev/guide/di).
 
-## How to use a module with DI support
+## How to use a module with DI support?
 Assuming you provided payments as the module name during generation;
 
 ### 1: Edit the `payment.interface.ts` file with the definitions of your configuration properties. See example below;
