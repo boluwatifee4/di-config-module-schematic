@@ -1,6 +1,6 @@
 {
   "name": "di-config-module-schematic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A schematic for generating DI-configured Angular modules.",
   "scripts": {
     "build": "tsc -p tsconfig.json",

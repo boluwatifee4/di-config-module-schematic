@@ -1,19 +1,63 @@
 <img width="1440" alt="image" src="https://github.com/user-attachments/assets/11aabd45-cf27-4a77-b1a8-1f64eebc2ebe" />
 
-# di-config-module-schematic
 
-## How to use
+# **di-config-module-schematic**
 
-- Clone the project
-- In your angular project directory run `schematics <path-to-schematics-project>:di-config-module-schematic` (This schematic is built to use prompts. Hence eliminating the need to pass/look for the schematic's options
-- Answer the questions asked in the terminal, once the processes are completed, you should have your module created and set-up to support [DI(dependency injection)](https://angular.dev/guide/di).
+## **How to Use**
 
-## How to use a module with DI support?
-Assuming you provided payments as the module name during generation;
+This schematic generates Angular modules with **Dependency Injection (DI)** support. You can use the schematic either **deployed from npm** or **locally** during development.
 
-### 1: Edit the `payment.interface.ts` file with the definitions of your configuration properties. See example below;
+---
 
-```ts
+### **Option 1: Use the Deployed Schematic from npm**
+
+1. Install the schematic globally:
+   ```bash
+   npm install -g di-config-module-schematic
+   ```
+
+2. Run the schematic in your Angular project directory:
+   ```bash
+   ng generate di-config-module-schematic:di-config-module-schematic
+   ```
+
+3. Follow the prompts in the terminal. Once completed, your module will be created and set up with **DI support**.
+
+---
+
+### **Option 2: Use the Schematic Locally**
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/di-config-module-schematic.git
+   cd di-config-module-schematic
+   ```
+
+2. Build the project:
+   ```bash
+   npm run build
+   ```
+
+3. Run the schematic in your Angular project:
+   ```bash
+   schematics <path-to-schematics-project>:di-config-module-schematic
+   ```
+
+4. Follow the prompts in the terminal. Once completed, your module will be created and set up with **DI support**.
+
+---
+
+## **How to Use a Module with DI Support**
+
+### Example: Payments Module
+
+Assume you provided `payments` as the module name during generation.
+
+### **1. Define Configuration Properties**
+
+Edit the `payments-config.interface.ts` file to include the configuration properties:
+
+```typescript
 export interface PaymentsConfig {
   baseUrl: string;            // The base URL for the payments API
   currency: string;           // Default currency for transactions
@@ -22,9 +66,14 @@ export interface PaymentsConfig {
 }
 ```
 
-### 2: Import generated module where needed. Eg;
+---
 
-```ts
+### **2. Import and Configure the Module**
+
+Import the generated module where needed and configure it using the `forRoot` method:
+
+**Example: `app.module.ts`**
+```typescript
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
@@ -34,7 +83,7 @@ import { PaymentsModule } from './app/payments/payments.module';
   declarations: [AppComponent],
   imports: [
     BrowserModule,
-     PaymentsModule.forRoot({
+    PaymentsModule.forRoot({
       baseUrl: 'https://api.example.com/payments',  // Payments API URL
       currency: 'USD',                             // Default currency
       retryAttempts: 3,                            // Retry attempts for failed requests
@@ -45,15 +94,16 @@ import { PaymentsModule } from './app/payments/payments.module';
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-
 ```
-Explanation:
 
-The forRoot method configures the module with a PaymentsConfig object.
+---
 
-### 3: Inject Configuration in Components
+### **3. Inject Configuration in Components**
 
-```ts
+Inject the configuration wherever required using the `PAYMENTS_CONFIG_TOKEN`.
+
+**Example: `app.component.ts`**
+```typescript
 import { Component, Inject } from '@angular/core';
 import { PAYMENTS_CONFIG_TOKEN } from './app/payments/payments-injection-tokens';
 import { PaymentsConfig } from './app/payments/payments-config.interface';
@@ -70,38 +120,40 @@ import { PaymentsConfig } from './app/payments/payments-config.interface';
 })
 export class AppComponent {
   constructor(@Inject(PAYMENTS_CONFIG_TOKEN) public config: PaymentsConfig) {
-        console.log("config props", config.baseUrl,  config.currency, config.retryAttempts, config.enableDebugMode)
-   }
+    console.log('Config Properties:', config.baseUrl, config.currency, config.retryAttempts, config.enableDebugMode);
+  }
 }
 ```
 
+---
 
+## **Getting Started With Schematics**
 
-# Getting Started With Schematics
+This repository serves as a starting point to create and publish Angular schematics.
 
-This repository is a basic Schematic implementation that serves as a starting point to create and publish Schematics to NPM.
+### **Testing Locally**
 
-### Testing
+1. Install the schematics CLI globally:
+   ```bash
+   npm install -g @angular-devkit/schematics-cli
+   ```
 
-To test locally, install `@angular-devkit/schematics-cli` globally and use the `schematics` command line tool. That tool acts the same as the `generate` command of the Angular CLI, but also has a debug mode.
+2. Run the schematic locally using the `schematics` CLI:
+   ```bash
+   schematics ./src/di-config-module-schematic:di-config-module-schematic
+   ```
 
-Check the documentation with
+3. Follow the prompts to generate your module.
 
+---
+
+### **Unit Testing**
+
+Run unit tests with:
 ```bash
-schematics --help
+npm run test
 ```
 
-### Unit Testing
+This uses Jasmine as the test framework.
 
-`npm run test` will run the unit tests, using Jasmine as a runner and test framework.
-
-### Publishing
-
-To publish, simply do:
-
-```bash
-npm run build
-npm publish
-```
-
-That's it!
+---!
