@@ -1,17 +1,22 @@
 {
   "name": "di-config-module-schematic",
-  "version": "0.0.0",
-  "description": "A blank schematics",
+  "version": "1.0.0",
+  "description": "A schematic for generating DI-configured Angular modules.",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && jasmine src/**/*_spec.js"
   },
   "keywords": [
-    "schematics"
+    "angular",
+    "schematics",
+    "dependency-injection",
+    "automation",
+    "module"
   ],
-  "author": "",
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
-  "schematics": "./src/collection.json",
+  "schematics": "./dist/src/collection.json",
+  "main": "./dist/src/index.js",
   "dependencies": {
     "@angular-devkit/core": "^19.0.6",
     "@angular-devkit/schematics": "^19.0.6",

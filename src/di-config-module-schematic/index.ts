@@ -6,18 +6,16 @@ import { Schema } from '../models/Ischema';
 
 export default function diConfigModuleSchematic(options: Schema): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    _context.logger.info(`Generating module with the following details:`);
-    _context.logger.info(`Module Name: ${options.moduleName}`);
-    _context.logger.info(`Config Interface Name: ${options.configInterfaceName}`);
-    _context.logger.info(`Injection Token Name: ${options.tokenName}`);
+    _context.logger.info(`Generating DI Config Module: ${options.moduleName}`);
 
-    const sourceTemplates = url('./files'); // Template files
+    const sourceTemplates = url('./files');
     const parameterizedTemplates = apply(sourceTemplates, [
       template({
-        ...options, // Inject options into templates
-        ...strings, // Utility functions like classify, dasherize, etc.
+        ...options, // User inputs (e.g., moduleName, configInterfaceName, tokenName)
+        name: options.moduleName, // Map `moduleName` to `name`
+        ...strings, // Utility functions
       }),
-      move(`src/app/${strings.dasherize(options.moduleName)}`), // Target location
+      move(`src/app/${strings.dasherize(options.moduleName)}`), // Destination folder
     ]);
 
     return mergeWith(parameterizedTemplates)(tree, _context);
