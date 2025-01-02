@@ -4,9 +4,15 @@
   "title": "DI Config Module Schematic",
   "type": "object",
   "properties": {
+    "action": {
+      "type": "string",
+      "enum": ["create", "update"],
+      "description": "Do you want to create a new module or update an existing one?",
+      "x-prompt": "Do you want to create a new module or update an existing one?"
+    },
     "moduleName": {
       "type": "string",
-      "description": "The name of the module to create",
+      "description": "The name of the module",
       "x-prompt": "What is the name of the module?"
     },
     "configInterfaceName": {
@@ -20,5 +26,5 @@
       "x-prompt": "What is the name of the InjectionToken?"
     }
   },
-  "required": ["moduleName"]
+  "required": ["action", "moduleName"]
 }

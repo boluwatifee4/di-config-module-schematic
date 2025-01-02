@@ -2,9 +2,10 @@
   "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "di-config-module-schematic": {
-      "description": "Generate a DI-configured module",
+      "description": "Generate or update a DI-configured module",
       "factory": "./index",
-      "schema": "./schema.json"
+      "schema": "./schema.json",
+      "aliases": ["di-module"]
     }
   }
 }
