@@ -1,4 +1,4 @@
-import { Rule, SchematicContext, Tree, apply, mergeWith, template, url, move } from '@angular-devkit/schematics';
+import { Rule, SchematicContext, Tree, apply, mergeWith, move, template, url } from '@angular-devkit/schematics';
 import { strings } from '@angular-devkit/core';
 import { Schema } from '../models/Ischema';
 import * as path from 'path';
@@ -18,32 +18,100 @@ export default function diConfigModuleSchematic(options: Schema): Rule {
   };
 }
 
+
 function createModule(options: Schema, context: SchematicContext): Rule {
   return (tree: Tree) => {
-    // Get the terminal's current working directory
+    // Locate the workspace root
+    // if (tree.exists('nx.json') && tree.exists('angular.json')) {
+    //   // find the dir path of either nx.json or angular.json without the help of find
+    //   const dir = path.dirname(tree.getDir('nx.json').path);
+    //   context.logger.info(`workspace root: ${dir}`);
+    // }
+
+    let workspaceRoots: string | null = null;
+
+    // Traverse the virtual file system to locate nx.json or angular.json
+    tree.visit((filePath) => {
+      const normalizedPath = filePath.replace(/\\/g, '/'); // Normalize path separators
+      if (normalizedPath.endsWith('nx.json') || normalizedPath.endsWith('angular.json')) {
+        workspaceRoots = path.dirname(normalizedPath); // Get the directory containing the file
+        return false; // Stop traversal once the file is found
+      }
+    });
+
+    if (!workspaceRoots) {
+      throw new Error('Could not find nx.json or angular.json in the virtual file system.');
+    }
+
+    context.logger.info(`workspace root: ${workspaceRoots}`);
+
+    const workspaceRoot = findWorkspaceRoot(tree);
+    context.logger.info(`workspace root: ${workspaceRoot}`);
+    if (!workspaceRoot) {
+      throw new Error('Could not locate workspace root (nx.json or angular.json).');
+    }
+
+    // Get the current directory where the schematic is run
     const currentDir = process.cwd();
-    const workspaceRoot = tree.root.path; // The root of the virtual file system
-    const relativeDir = path.relative(workspaceRoot, currentDir); // Map the real current directory to the virtual file system
 
-    context.logger.info(`Creating module in: ${currentDir} (mapped to: ${relativeDir})`);
+    // Calculate the relative path from the workspace root to the current directory
+    const relativePath = getRelativePath(workspaceRoot, currentDir);
+    context.logger.info(`relative path: ${relativePath}`);
+    if (!relativePath || relativePath.startsWith('..')) {
+      throw new Error(
+        `The current directory (${currentDir}) is not within the workspace root (${workspaceRoot}).`
+      );
+    }
 
-    // Load the template files
+    context.logger.info(
+      `Generating files in: ${currentDir} (relative to workspace root: ${relativePath})`
+    );
+
+    // Load template files
     const sourceTemplates = url('./files');
 
-    // Apply template variables and move the files directly to the target directory
+    // Apply templates and move files to the resolved relative path
     const parameterizedTemplates = apply(sourceTemplates, [
       template({
-        ...options, // User inputs
-        name: options.moduleName, // Map `moduleName` to `name`
-        ...strings, // Utility functions for casing
+        ...options,
+        name: options.moduleName,
+        ...strings,
       }),
-      move(relativeDir), // Move files to the resolved relative directory
+      move(relativePath),
     ]);
 
-    // Merge the templates with the current Tree
     return mergeWith(parameterizedTemplates)(tree, context);
   };
 }
+
+function getRelativePath(workspaceRoot: string, currentDir: string): string | null {
+  if (!currentDir.startsWith(workspaceRoot)) {
+    return null; // Current directory is outside the workspace root
+  }
+  return currentDir.slice(workspaceRoot.length).replace(/^\/+/, ''); // Trim leading slashes
+}
+
+
+/**
+ * Finds the root of the workspace by locating nx.json or angular.json.
+ */
+function findWorkspaceRoot(tree: Tree): string | null {
+  const potentialFiles = ['nx.json', 'angular.json'];
+  let workspaceRoot: string | null = null;
+
+  tree.visit((filePath) => {
+    // Normalize paths for consistent comparison
+    const normalizedPath = filePath.replace(/\\/g, '/');
+    for (const file of potentialFiles) {
+      if (normalizedPath.endsWith(`/${file}`)) {
+        workspaceRoot = normalizedPath.replace(`/${file}`, ''); // Remove the filename
+      }
+    }
+  });
+
+  return workspaceRoot;
+}
+
 
 
 
