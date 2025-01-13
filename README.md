@@ -1,5 +1,7 @@
 # **di-config-module-schematic** 🛠️
 
+<img width="801" alt="image" src="https://github.com/user-attachments/assets/b74bfa49-6dd5-4023-bcee-cb3cf571ee69" />
+
 ## **How to Use** 🧑‍💻
 
 This schematic generates Angular modules with **Dependency Injection (DI)** support. It supports two key actions: **create** ➕ and **update** 🔄, making it easy to generate new modules or enhance existing ones. The schematic is designed to be directory-aware 📂, meaning:
