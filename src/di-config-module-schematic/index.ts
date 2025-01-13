@@ -46,7 +46,6 @@ function createModule(options: Schema, context: SchematicContext): Rule {
 
 function updateModule(options: Schema, context: SchematicContext): Rule {
   return (tree: Tree) => {
-    // Get normalized path from workspace root
     const normalizedPath = getNormalizedPathFromWorkspaceRoot(tree, context);
     const moduleFileName = `${strings.dasherize(options.moduleName)}.module.ts`;
     const modulePath = `${normalizedPath}/${moduleFileName}`;
@@ -76,9 +75,10 @@ function updateModule(options: Schema, context: SchematicContext): Rule {
     // Generate missing files in the normalized path
     generateMissingFiles(tree, normalizedPath, options);
 
-    return tree; // Return the modified Tree
+    return tree;
   };
 }
+
 
 /**
  * Adds the forRoot method to the module content if it doesn't already exist.
@@ -88,12 +88,24 @@ function addForRootMethod(
   options: Schema,
   context: SchematicContext
 ): string {
-  const ngModuleDecoratorRegex = /@NgModule\(\{[^}]*\}\)/s; // Match the @NgModule decorator
-  const match = moduleContent.match(ngModuleDecoratorRegex);
+  // Match the class declaration for the module
+  const classDeclarationRegex = new RegExp(
+    `export class ${strings.classify(options.moduleName)}Module\\s*\\{`,
+    'm'
+  );
+  const match = moduleContent.match(classDeclarationRegex);
 
   if (!match) {
-    context.logger.error(`@NgModule decorator not found in module content.`);
-    throw new Error('@NgModule decorator not found. Could not add forRoot method.');
+    context.logger.error(
+      `Module class "export class ${strings.classify(
+        options.moduleName
+      )}Module" not found in module content.`
+    );
+    throw new Error(
+      `Module class "export class ${strings.classify(
+        options.moduleName
+      )}Module" not found. Could not add forRoot method.`
+    );
   }
 
   const forRootMethod = `
@@ -109,10 +121,16 @@ function addForRootMethod(
   }
   `;
 
-  // Insert the forRoot method after the @NgModule decorator
-  const updatedContent = moduleContent.replace(match[0], `${match[0]}\n\n${forRootMethod}`);
+  // Insert the forRoot method inside the class
+  const updatedContent = moduleContent.replace(
+    classDeclarationRegex,
+    (match) => `${match}\n${forRootMethod}`
+  );
+
+  context.logger.info(`forRoot method added to module class.`);
   return updatedContent;
 }
+
 
 
 /**
