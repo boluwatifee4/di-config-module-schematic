@@ -78,7 +78,7 @@ To update an existing module:
    - InjectionToken name 🔑
 
 The schematic will:
-- Add a `forRoot` method for DI configuration if not already present.
+- Update the `forRoot` method for DI configuration if not already present.
 - Generate missing files like the configuration interface 📝 and InjectionToken 🔑, if required.
 
 ---
@@ -160,6 +160,24 @@ export class AppComponent {
   }
 }
 ```
+
+### **Key Challenges and Solutions**
+
+---
+
+#### Path Normalization
+- **Challenge:** 
+  Files were created in incorrect locations due to absolute system paths (`/Users/...`) instead of workspace-relative paths (`apps/...`, `libs/...`).
+- **Solution:** 
+  Implemented a utility to detect the workspace root (`nx.json` or `angular.json`) and normalize paths dynamically.
+
+---
+
+####  User-Friendly Interaction
+- **Challenge:** 
+  Long CLI commands with multiple options were error-prone and intimidating for users.
+- **Solution:** 
+  Introduced interactive prompts using `x-prompt` and shortened the schematic name to `di-module` for a streamlined experience.
 
 ---
 
